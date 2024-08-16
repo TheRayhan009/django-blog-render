@@ -89,12 +89,13 @@ def login(request):
 
 
 def Dblog(request,link):
+    fname = request.session.get("frist_name")
+    lname = request.session.get("last_name")
+    
     tORf = request.session.get("tORf")
     uname = request.session.get("username")
     fimg = request.session.get("profilepic")
     UPcomment=request.POST.get("Ucomment")
-    fname = request.session.get("frist_name")
-    lname = request.session.get("last_name")
     PTslug=UBlog.objects.get(A_slugUserBlog=link).A_slugUserBlog
     CUimage=fimg[6:]
     if request.method=="POST":
@@ -108,7 +109,7 @@ def Dblog(request,link):
         "tORf": tORf,
         "uname": uname,
         "pic":fimg,
-        "com":comments
+        "com":comments,
     }
     return render(request,"Dblog.html",ele)
 
@@ -119,8 +120,6 @@ def search(request):
     tORf = request.session.get("tORf")
     uname = request.session.get("username")
     fimg = request.session.get("profilepic")
-    # fname = request.session.get("frist_name")
-    # lname = request.session.get("last_name")
     if request.method=="GET":
         s=request.GET.get("usearch")
         data=UBlog.objects.filter(Utitel__icontains=s)
@@ -134,30 +133,33 @@ def search(request):
     return render(request,"search.html",ele)
 
 def blog(request):
-    data=UBlog.objects.all()
-    page=Paginator(data,12)
-    x=request.GET.get("page")
-    filan=page.get_page(x)
-    
-    tORf = request.session.get("tORf")
-    uname = request.session.get("username")
-    fimg = request.session.get("profilepic")
-    
     fname = request.session.get("frist_name")
     lname = request.session.get("last_name")
+    if fname and lname:
+        data=UBlog.objects.all()
+        page=Paginator(data,12)
+        x=request.GET.get("page")
+        filan=page.get_page(x)
+        
+        tORf = request.session.get("tORf")
+        uname = request.session.get("username")
+        fimg = request.session.get("profilepic")
+        
+        
+        co=page.num_pages
+        
+        ele={
+            "element":filan,
+            "r":range(1,co+1),
+            "tORf": tORf,
+            "uname": uname,
+            "pic":fimg,
+            "fulname":fname+" "+lname,
+        }
+        return render(request,"allblogs.html",ele)
+    else:
+        return redirect("/signin/")
     
-    co=page.num_pages
-    
-    ele={
-        "element":filan,
-        "r":range(1,co+1),
-        "tORf": tORf,
-        "uname": uname,
-        "pic":fimg,
-        "fulname":fname+" "+lname,
-    }
-    return render(request,"allblogs.html",ele)
-
 
 def myprofile(request):
     
@@ -185,7 +187,6 @@ def myprofile(request):
         "uname": uname,
         "pic":fimg,
         "fulname":fname+" "+lname,
-        # "lname":lname,
         "email":email,
         "phone":phone,
         "blogs":sblog,
@@ -199,40 +200,43 @@ def myprofile(request):
 
 
 def postblog(request):
-    tORf = request.session.get("tORf")
     fname = request.session.get("frist_name")
     lname = request.session.get("last_name")
-    fimg = request.session.get("profilepic")
-    uname = request.session.get("username")
-    fn = fname+" "+lname
-    if request.method == "POST":
-        titel = request.POST.get("blogtitel")
-        blog_txt = request.POST.get("blogtxt")
-        blog_image = request.FILES.get("blogimg")
-        # blog_date = request.POST.get("blogdate")
-        blog_category = request.POST.get("blogcategory")
+    if fname and lname:
+        tORf = request.session.get("tORf")
+        fimg = request.session.get("profilepic")
+        uname = request.session.get("username")
+        fn = fname+" "+lname
         
-        
-        UblogDATA = UBlog(
-            Utitel=titel,
-            Upost_blog=blog_txt,
-            Upost_image=blog_image,
-            # Udate_of_post=blog_date,
-            Upost_category=blog_category,
-            Uproimage=fimg,  
-            Uname=uname,
-            UFname=fn,
-        )
-        UblogDATA.save()
+        if request.method == "POST":
+            titel = request.POST.get("blogtitel")
+            blog_txt = request.POST.get("blogtxt")
+            blog_image = request.FILES.get("blogimg")
+            blog_category = request.POST.get("blogcategory")
+            
+            
+            UblogDATA = UBlog(
+                Utitel=titel,
+                Upost_blog=blog_txt,
+                Upost_image=blog_image,
+                Upost_category=blog_category,
+                Uproimage=fimg,  
+                Uname=uname,
+                UFname=fn,
+            )
+            UblogDATA.save()
+            return redirect("/blog/")
 
-    ele = {
-        "tORf": tORf,
-        "fulname": f"{fname} {lname}",
-        "pic": fimg,
-        "uname":uname,
-    }
-    
-    return render(request, "postBlog.html", ele)
+        ele = {
+            "tORf": tORf,
+            "fulname": f"{fname} {lname}",
+            "pic": fimg,
+            "uname":uname,
+        }
+        
+        return render(request, "postBlog.html", ele)
+    else:
+        return redirect("/signin/")
 
 
 def image(request):
@@ -253,31 +257,35 @@ def image(request):
     return render(request,"image.html",ele)
     
 def postimage(request):
-    tORf = request.session.get("tORf")
     fname = request.session.get("frist_name")
     lname = request.session.get("last_name")
-    fimg = request.session.get("profilepic")
-    uname = request.session.get("username")
-    CUimage=fimg[6:]
-    if request.method=="POST":
-        Uimg = request.FILES.get("image")
-        Utitel=request.POST.get("title")
-        Udata=UPImage(
-            UPimage=Uimg,
-            UPtitel=Utitel,
-            PUimage=CUimage,
-            PUname=f"{fname} {lname}",
-        )
-        Udata.save()
-    
-    ele = {
-        "tORf": tORf,
-        "fulname": f"{fname} {lname}",
-        "pic": fimg,
-        "uname":uname,
-    }
-    
-    return render(request,"postImage.html",ele)
+    if fname and lname:
+        tORf = request.session.get("tORf")
+        fimg = request.session.get("profilepic")
+        uname = request.session.get("username")
+        CUimage=fimg[6:]
+        if request.method=="POST":
+            Uimg = request.FILES.get("image")
+            Utitel=request.POST.get("title")
+            Udata=UPImage(
+                UPimage=Uimg,
+                UPtitel=Utitel,
+                PUimage=CUimage,
+                PUname=f"{fname} {lname}",
+            )
+            Udata.save()
+            return redirect("/image/")
+        
+        ele = {
+            "tORf": tORf,
+            "fulname": f"{fname} {lname}",
+            "pic": fimg,
+            "uname":uname,
+        }
+        
+        return render(request,"postImage.html",ele)
+    else:
+        return redirect("/signin/")
 
 
 def edit(request,link):
