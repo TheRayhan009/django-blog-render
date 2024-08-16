@@ -91,27 +91,29 @@ def login(request):
 def Dblog(request,link):
     fname = request.session.get("frist_name")
     lname = request.session.get("last_name")
-    
-    tORf = request.session.get("tORf")
-    uname = request.session.get("username")
-    fimg = request.session.get("profilepic")
-    UPcomment=request.POST.get("Ucomment")
-    PTslug=UBlog.objects.get(A_slugUserBlog=link).A_slugUserBlog
-    CUimage=fimg[6:]
-    if request.method=="POST":
-        Sdata=Comment(Ucomment=UPcomment,UPBslug=PTslug,Ucomment_image=CUimage,PURname=f"{fname} {lname}")
-        Sdata.save()
-    comments = comments = Comment.objects.filter(UPBslug=PTslug)
-    comments=comments[::-1]
-        
-    ele={
-        "element":UBlog.objects.get(A_slugUserBlog=link),
-        "tORf": tORf,
-        "uname": uname,
-        "pic":fimg,
-        "com":comments,
-    }
-    return render(request,"Dblog.html",ele)
+    if fname and lname:
+        tORf = request.session.get("tORf")
+        uname = request.session.get("username")
+        fimg = request.session.get("profilepic")
+        UPcomment=request.POST.get("Ucomment")
+        PTslug=UBlog.objects.get(A_slugUserBlog=link).A_slugUserBlog
+        CUimage=fimg[6:]
+        if request.method=="POST":
+            Sdata=Comment(Ucomment=UPcomment,UPBslug=PTslug,Ucomment_image=CUimage,PURname=f"{fname} {lname}")
+            Sdata.save()
+        comments = comments = Comment.objects.filter(UPBslug=PTslug)
+        comments=comments[::-1]
+            
+        ele={
+            "element":UBlog.objects.get(A_slugUserBlog=link),
+            "tORf": tORf,
+            "uname": uname,
+            "pic":fimg,
+            "com":comments,
+        }
+        return render(request,"Dblog.html",ele)
+    else:
+        return redirect("/signin")
 
 
 def search(request):
