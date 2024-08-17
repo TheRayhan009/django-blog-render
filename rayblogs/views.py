@@ -11,14 +11,6 @@ from likes.models import Likes
 from dislikes.models import DisLikes
 import os
 
-# def all(request):
-#     tORf = request.session.get("tORf", False)
-#     uname = request.session.get("username", "")
-#     data = {
-#         "tORf": tORf,
-#         "uname": uname,
-#     }
-#     return render(request, "all.html", data)
 
 def home(request):
     tORf = request.session.get("tORf")
@@ -32,9 +24,7 @@ def home(request):
     }
     return render(request, "home.html", ele)
 
-
 def signin(request):
-    
     if request.method=="POST":
         chak=False
         fname=request.POST.get("fristname")
@@ -56,8 +46,6 @@ def signin(request):
             return HttpResponseRedirect("/login")
         
     return render(request,"signin.html")
-
-
 
 def login(request):
     if request.method == "POST":
@@ -148,7 +136,6 @@ def blog(request):
         uname = request.session.get("username")
         fimg = request.session.get("profilepic")
         
-        
         co=page.num_pages
         
         ele={
@@ -216,7 +203,6 @@ def postblog(request):
             blog_txt = request.POST.get("blogtxt")
             blog_image = request.FILES.get("blogimg")
             blog_category = request.POST.get("blogcategory")
-            
             
             UblogDATA = UBlog(
                 Utitel=titel,
@@ -362,10 +348,6 @@ def delete(request,link):
     return render(request,"delete.html",ele)
 
 def like(request,link):
-    tORf = request.session.get("tORf")
-    fname = request.session.get("frist_name")
-    lname = request.session.get("last_name")
-    fimg = request.session.get("profilepic")
     uname = request.session.get("username")
     DLUdata=DisLikes.objects.filter(UserName=uname,A_likeSlug=link)
     LUdata=Likes.objects.filter(UserName=uname,A_likeSlug=link)
@@ -397,10 +379,6 @@ def like(request,link):
     return redirect("/image")
 
 def dislike(request,link):
-    tORf = request.session.get("tORf")
-    fname = request.session.get("frist_name")
-    lname = request.session.get("last_name")
-    fimg = request.session.get("profilepic")
     uname = request.session.get("username")
     LUdata=Likes.objects.filter(UserName=uname,A_likeSlug=link)
     DLUdata=DisLikes.objects.filter(UserName=uname,A_likeSlug=link)
