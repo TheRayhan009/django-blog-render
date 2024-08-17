@@ -86,4 +86,6 @@ User-uploaded files such as images are stored in the `media` directory. Make sur
 
 This project is licensed under the MIT License. See the `LICENSE` file for more details.
 
+## Developers
 
+- TheRayhan009
